@@ -57,5 +57,5 @@ var fn_detail = async (ctx, next) => {
         });
 }
 module.exports = {
-    'POST /detail/:id': fn_detail
+    'GET /detail/:id': fn_detail
 };

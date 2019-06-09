@@ -1,6 +1,6 @@
 var mysql = require('mysql');
 
-var fn_detail = async (ctx, next) => {
+var fn_delete = async(ctx, next) => {
     let pool = mysql.createPool({
         host: 'localhost',
         user: 'root',
@@ -27,35 +27,26 @@ var fn_detail = async (ctx, next) => {
 
     }
     // 查找用户
-    findUserData = (id) => {
-        let _sql = `select * from article where id=${id}`;
+    deleteArticle = (deleteNum) => {
+        let _sql =`delete from article where id=${deleteNum}`;
         return query(_sql)
     }
     var data = {
         status: 0,
         message: "",
-        article: {},
+        articles: [],
     };
-    const id = ctx.params.id;
-    console.log(id);
-
-    await findUserData(id)
-        .then(results => {
-            if (results.length == 0) {
-                data.status = 1;
-                data.message = '无数据';
-            }
-            else {
-                data.article = {
-                    number: results[0].id,
-                    title: results[0].title,
-                    content: results[0].content,
-                };
-            }
-            ctx.response.status = 200;
-            ctx.response.body = JSON.stringify(data);
-        });
+    const deleteNum = ctx.request.body.number;
+    console.log(deleteNum);
+    await deleteArticle(deleteNum)
+    .then(result => {
+        data.message = '删除成功';
+        ctx.response.status = 200;
+        ctx.response.body = JSON.stringify(data);
+    })       
+    return;
 }
+
 module.exports = {
-    'POST /detail/:id': fn_detail
+    'POST /delete/': fn_delete
 };

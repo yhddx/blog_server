@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 
-var fn_detail = async (ctx, next) => {
+
+var fn_edit = async(ctx, next) => {
     let pool = mysql.createPool({
         host: 'localhost',
         user: 'root',
@@ -27,35 +28,25 @@ var fn_detail = async (ctx, next) => {
 
     }
     // 查找用户
-    findUserData = (id) => {
-        let _sql = `select * from article where id=${id}`;
+    updataArticle = (title, content, number) => {
+        let _sql = `update article set title='${title}', content='${content}' where id=${number}`;
         return query(_sql)
     }
     var data = {
         status: 0,
         message: "",
-        article: {},
+        articles: [],
     };
-    const id = ctx.params.id;
-    console.log(id);
-
-    await findUserData(id)
-        .then(results => {
-            if (results.length == 0) {
-                data.status = 1;
-                data.message = '无数据';
-            }
-            else {
-                data.article = {
-                    number: results[0].id,
-                    title: results[0].title,
-                    content: results[0].content,
-                };
-            }
-            ctx.response.status = 200;
-            ctx.response.body = JSON.stringify(data);
-        });
+    const editArticle = ctx.request.body; 
+    await updataArticle(editArticle.title, editArticle.content, editArticle.number)
+    .then(results =>{
+        data.message = "update success";
+        ctx.response.status = 200;
+        ctx.response.body = JSON.stringify(data);
+    })
+    return;
 }
+
 module.exports = {
-    'POST /detail/:id': fn_detail
+    'POST /edit/:number': fn_edit
 };

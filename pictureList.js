@@ -1,6 +1,12 @@
 var mysql = require('mysql');
 
-var fn_detail = async (ctx, next) => {
+/*前端传来表单数据+cookie
+cookie中获取userid
+用当前时间+userid生成文件名；
+
+*/
+
+var fn_pictureList = async (ctx, next) => {
     let pool = mysql.createPool({
         host: 'localhost',
         user: 'root',
@@ -26,36 +32,31 @@ var fn_detail = async (ctx, next) => {
         })
 
     }
+
+
     // 查找用户
-    findUserData = (id) => {
-        let _sql = `select * from article where id=${id}`;
+    findImgList = () => {
+        let _sql = `select * from imagefile;`;
         return query(_sql)
     }
-    var data = {
-        status: 0,
-        message: "",
-        article: {},
-    };
-    const id = ctx.params.id;
-    console.log(id);
+    let array = [];
 
-    await findUserData(id)
-        .then(results => {
-            if (results.length == 0) {
-                data.status = 1;
-                data.message = '无数据';
-            }
-            else {
-                data.article = {
-                    number: results[0].id,
-                    title: results[0].title,
-                    content: results[0].content,
-                };
-            }
-            ctx.response.status = 200;
-            ctx.response.body = JSON.stringify(data);
-        });
+    await findImgList()
+        .then(result => {
+            array = result;
+            const body = array.map(element => {
+                return {
+                    "uid":element.id,
+                    "name": element.id,
+                    "status": "done",
+                    "url": `http://127.0.0.1:8888${element.path}`,
+                    "thumbUrl": `http://127.0.0.1:8888${element.path}`,
+                }
+            });
+            return ctx.body = JSON.stringify(body);
+        })
 }
+
 module.exports = {
-    'POST /detail/:id': fn_detail
+    'GET /picture/': fn_pictureList
 };
