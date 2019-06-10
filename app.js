@@ -63,7 +63,7 @@ app.use(async (ctx, next) => {
         await next();
         return;
     }
-    if(h === 'http://localhost:9090'){
+    if(h === 'http://localhost:9090' || h == 'https://www.yhddx.cn'){
         await next();
         console.log('website')
         return;
